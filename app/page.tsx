@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import CustomCursor from './components/CustomCursor'
 import IntroSlide from './slides/IntroSlide'
 import DestinationSlide from './slides/DestinationSlide'
 import RetailSlide from './slides/RetailSlide'
@@ -39,24 +40,26 @@ export default function DeckPage() {
   }
 
   // Keyboard navigation
-useEffect(() => {
-  const handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key === 'ArrowRight' && currentSlide < slides.length - 1) {
-      setCurrentSlide(currentSlide + 1)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight' && currentSlide < slides.length - 1) {
+        setCurrentSlide(currentSlide + 1)
+      }
+      if (e.key === 'ArrowLeft' && currentSlide > 0) {
+        setCurrentSlide(currentSlide - 1)
+      }
     }
-    if (e.key === 'ArrowLeft' && currentSlide > 0) {
-      setCurrentSlide(currentSlide - 1)
-    }
-  }
 
-  window.addEventListener('keydown', handleKeyDown)
-  return () => window.removeEventListener('keydown', handleKeyDown)
-}, [currentSlide])
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [currentSlide])
 
   const CurrentSlideComponent = slides[currentSlide].component
 
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-black">
+      <CustomCursor />
+
       {/* Sidebar Navigation */}
       <div className="fixed left-0 top-0 z-50 h-full w-64 bg-black/90 border-r border-white/10 p-6">
         <div className="mb-8">
@@ -102,11 +105,17 @@ useEffect(() => {
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide}
-            initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -100 }}
-            transition={{ duration: 0.5 }}
+            initial={{ opacity: 0, x: 100, rotateY: -15 }}
+            animate={{ opacity: 1, x: 0, rotateY: 0 }}
+            exit={{ opacity: 0, x: -100, rotateY: 15 }}
+            transition={{ 
+              duration: 0.8,
+              type: "spring",
+              stiffness: 50,
+              damping: 20
+            }}
             className="h-full"
+            style={{ perspective: '1000px' }}
           >
             <CurrentSlideComponent />
           </motion.div>
